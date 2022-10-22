@@ -1,12 +1,15 @@
-import { Injectable } from "@nestjs/common";
+import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
+import { Cache } from "cache-manager";
 import * as jwt from "jsonwebtoken";
 
 
 @Injectable()
 export class JwtTokenService {
-    generateIdToken(payload: any, expiryTime: string): Promise<string> {
+    constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache){}
+
+    generateIdToken(payload: tokenPayload, expiryTime: string): Promise<string> {
         return new Promise((resolve, reject) => {
-            jwt.sign(payload, "SECRET", {
+            jwt.sign(payload, process.env.JWT_SECRET, {
                 expiresIn: expiryTime,
                 issuer: "RilHomie"
             }, (err, token) => {
@@ -16,9 +19,35 @@ export class JwtTokenService {
         })
     }
 
-    generateRefreshToken(payload: any, expiryTime: string): Promise<string> {
+    generateRefreshToken(payload: tokenPayload, expiryTime: string): Promise<string> {
         return new Promise((resolve, reject) => {
-            jwt.sign(payload, "SECRET", {
+            jwt.sign(payload, process.env.JWT_SECRET, {
+                expiresIn: expiryTime,
+                issuer: "RilHomie"
+            }, async (err, token) => {
+                if (err) reject(err)
+                await this.cacheManager.set(payload.id, token, { ttl: 3600*24*12 })
+                resolve(token)
+            })
+        })
+    }
+
+    generateEmailVerificationToken(payload: tokenPayload): Promise<string> {
+        return new Promise((resolve, reject) => {
+            jwt.sign(payload, process.env.JWT_SECRET, {
+                expiresIn: "1d",
+                issuer: "RilHomie"
+            }, async (err, token) => {
+                if (err) reject(err)
+                await this.cacheManager.set(payload.id, token, { ttl: 3600*24 })
+                resolve(token)
+            })
+        })
+    }
+
+    generateAuthToken(payload: tokenPayload, expiryTime: string): Promise<string> {
+        return new Promise((resolve, reject) => {
+            jwt.sign(payload, process.env.JWT_SECRET, {
                 expiresIn: expiryTime,
                 issuer: "RilHomie"
             }, (err, token) => {
@@ -28,28 +57,18 @@ export class JwtTokenService {
         })
     }
 
-    generateAuthToken(payload: any, expiryTime: string): Promise<string> {
+    verifyRefreshToken(refreshToken: string): Promise<tokenPayload> {
         return new Promise((resolve, reject) => {
-            jwt.sign(payload, "SECRET", {
-                expiresIn: expiryTime,
-                issuer: "RilHomie"
-            }, (err, token) => {
+            jwt.verify(refreshToken, process.env.JWT_SECRET, async (err, payload: any) => {
                 if (err) reject(err)
-                resolve(token)
+                const userId = payload.id
+                const cachedToken = await this.cacheManager.get(userId)
+                if (refreshToken != cachedToken) {
+                    return reject(new Error("Invalid Token Credentials"))
+                }
+                const returnPayload: tokenPayload = { id: payload.id, username: payload.username }
+                resolve(returnPayload)
             })
         })
-    }
-
-    verifyToken(token: string){
-        jwt.verify(token, "SECRET", function(err, decoded) {
-            if (err) {
-                return false
-            }
-            return decoded
-        })
-    }
-
-    refreshToken(oldToken: string, refreshToken: string) {
-        
     }
 }

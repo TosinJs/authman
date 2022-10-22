@@ -1,5 +1,9 @@
+ import { IsNotEmpty } from "class-validator";
+
 export class RefreshTokenDto {
-    username: string;
-    password: string;
+    @IsNotEmpty({
+        message: "No User Token Present"
+    })
+    refreshToken: string
 }
   

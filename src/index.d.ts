@@ -4,3 +4,10 @@ interface responseObj {
     idToken: string,
     tokenType: "Bearer"
 }
+
+interface tokenPayload {
+    id: string,
+    username: string,
+    email?: string,
+    isVerified?: boolean
+}
