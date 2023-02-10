@@ -12,9 +12,7 @@ yarn-error.log*
 lerna-debug.log*
 
 # OS
-.env
 .DS_Store
-.env
 
 # Tests
 /coverage
@@ -23,6 +21,7 @@ lerna-debug.log*
 # IDEs and editors
 /.idea
 .project
+.env
 .classpath
 .c9/
 *.launch

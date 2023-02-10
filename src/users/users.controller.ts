@@ -22,17 +22,17 @@ export class UsersController {
 
   @Post('/refresh')
   async refresh(@Body() refreshToken: RefreshTokenDto) {
-    return this.usersService.refresh(refreshToken)
+    return this.usersService.refresh(refreshToken);
   }
 
   @Get('/reset-password')
   async reset(@Body() refreshUserPasswordDto: RefreshUserPasswordDto) {
-    return this.usersService.reset(refreshUserPasswordDto)
+    return this.usersService.reset(refreshUserPasswordDto);
   }
 
   @Get('/confirm-email/:token')
   @Redirect('/', 301)
   async confirmEmail(@Param() token: EmailTokenDto) {
-    return this.usersService.confirmEmail(token)
+    return this.usersService.confirmEmail(token);
   }
 }
