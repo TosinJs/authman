@@ -28,6 +28,11 @@ export class MailService {
         },
       });
     } catch (error) {
+      /*
+      Logger Should Handle this. 
+      I dont want to throw an exception here,
+      cos not sending a mail shouldnt break the flow.
+      */
       console.log(error);
     }
   }
