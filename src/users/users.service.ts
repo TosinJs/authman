@@ -1,6 +1,4 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { EmailTokenDto } from './dto/email-token.dto';
 import { LoginUserDto } from './dto/login-user.dto';
@@ -9,15 +7,15 @@ import { RefreshUserPasswordDto } from './dto/resfresh-password.dto';
 import { EncryptService } from './encrypt/encrypt.service';
 import { JwtTokenService } from './jwt/jwt.service';
 import { MailService } from './mail/mail.service';
-import { User, UserDocument } from './schemas/user.schema';
+import { DBService } from './db.service';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectModel(User.name) private userModel: Model<UserDocument>,
     private jwtService: JwtTokenService,
     private mailService: MailService,
     private encryptService: EncryptService,
+    private dbService: DBService,
   ) {}
 
   private async genToken(payload): Promise<responseObj> {
@@ -31,11 +29,7 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto) {
-    const user = new this.userModel();
-    user.username = createUserDto.username;
-    user.password = createUserDto.password;
-    user.email = createUserDto.email;
-    await user.save();
+    const user = await this.dbService.createUser(createUserDto);
 
     const payload: tokenPayload = {
       id: user.id,
@@ -43,15 +37,13 @@ export class UsersService {
       email: user.email,
       isVerified: false,
     };
-    await this.mailService.sendMail('test@example.com', payload);
+    await this.mailService.sendMail(user.email, payload);
     const idToken = await this.jwtService.generateIdToken(payload, '1d');
     return { idToken, tokenType: 'Bearer' };
   }
 
   async login(loginUserDto: LoginUserDto): Promise<responseObj> {
-    const user = await this.userModel.findOne({
-      username: loginUserDto.username,
-    });
+    const user = await this.dbService.findByUsername(loginUserDto.username);
     if (!user) {
       throw new HttpException(
         'Invalid User Credentials',
@@ -103,7 +95,7 @@ export class UsersService {
     const token = await this.encryptService.decrypt(inputToken.token);
     //dont proceed if theres no token
     const userTokenPayload = await this.jwtService.verifyRefreshToken(token);
-    await this.userModel.findByIdAndUpdate(userTokenPayload.id, {
+    await this.dbService.findByIdAndUpdate(userTokenPayload.id, {
       emailVerified: true,
     });
     return this.genToken(userTokenPayload);

@@ -12,6 +12,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { join } from 'path';
 import { EncryptService } from './encrypt/encrypt.service';
 import * as dotenv from 'dotenv';
+import { DBService } from './db.service';
 dotenv.config();
 
 @Module({
@@ -67,6 +68,12 @@ dotenv.config();
     }),
   ],
   controllers: [UsersController],
-  providers: [UsersService, JwtTokenService, MailService, EncryptService],
+  providers: [
+    UsersService,
+    JwtTokenService,
+    MailService,
+    EncryptService,
+    DBService,
+  ],
 })
 export class UsersModule {}
