@@ -1,0 +1,156 @@
+{
+	"info": {
+		"_postman_id": "8b33d0e2-a4a6-468f-9970-e129b0413077",
+		"name": "Authman",
+		"description": "Authentication Service Built in NestJS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "signup",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"sabivibes\",\r\n    \"password\": \"password\",\r\n    \"email\": \"email here\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/users/signup",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"signup"
+					]
+				},
+				"description": "Register a new user"
+			},
+			"response": []
+		},
+		{
+			"name": "login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"themselves\",\r\n    \"password\": \"password\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/users/login",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"login"
+					]
+				},
+				"description": "Login a new user"
+			},
+			"response": []
+		},
+		{
+			"name": "refresh",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyZmU0NjFhNjRmYjdiYWY0YmZlYWQwZSIsInVzZXJuYW1lIjoid2FuZGUiLCJpYXQiOjE2NjA4MzI3MzIsImV4cCI6MTY5MjM5MDMzMiwiaXNzIjoiUmlsSG9taWUifQ.8DCdBqu8bNJ3WaVKTtNMLLEkmkcdBZ_yLZwn94vaaXU\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/users/refresh",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"refresh"
+					]
+				},
+				"description": "Get a Refresh Token"
+			},
+			"response": []
+		},
+		{
+			"name": "confirm-email",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/users/confirm-email/:token",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"confirm-email",
+						":token"
+					],
+					"variable": [
+						{
+							"key": "token",
+							"value": "ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SnBaQ0k2SWpZek1EQm1Oell6Tm1VeVpHTmlaamMyTXpObE0yWmtaU0lzSW5WelpYSnVZVzFsSWpvaWQyRnVaR1VnWTI5c1pXMWhiaUlzSW1saGRDSTZNVFkyTVRBd056Y3hOaXdpWlhod0lqb3hOall4TURrME1URTJMQ0pwYzNNaU9pSlNhV3hJYjIxcFpTSjkuSmE5WmJUSkVDUFR5bFFFZmtndk9XQVZ4cHBPWElsYUx3MEZ2c0Z0c0xRSQ=="
+						}
+					]
+				},
+				"description": "Confirm Email Adress link"
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "host",
+			"value": "http://localhost:8080"
+		}
+	]
+}
