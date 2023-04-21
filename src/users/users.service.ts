@@ -8,6 +8,7 @@ import { EncryptService } from './encrypt/encrypt.service';
 import { JwtTokenService } from './jwt/jwt.service';
 import { MailService } from './mail/mail.service';
 import { DBService } from './database/db.service';
+import { BadRequestError } from 'src/utils/serviceErrorBuilder.utils';
 
 @Injectable()
 export class UsersService {
@@ -45,15 +46,15 @@ export class UsersService {
   async login(loginUserDto: LoginUserDto): Promise<responseObj> {
     const user = await this.dbService.findByUsername(loginUserDto.username);
     if (!user) {
-      throw new HttpException(
+      throw new BadRequestError(
         'Invalid User Credentials',
-        HttpStatus.BAD_REQUEST,
+        new Error('Invalid Login Credentials'),
       );
     }
     if (!(await user.comparePassword(loginUserDto.password))) {
-      throw new HttpException(
+      throw new BadRequestError(
         'Invalid User Credentials',
-        HttpStatus.BAD_REQUEST,
+        new Error('Invalid Login Credentials'),
       );
     }
     const payload: tokenPayload = {
@@ -73,9 +74,9 @@ export class UsersService {
       return this.genToken(userTokenPayload);
     } catch (error) {
       if (error.message == 'Invalid Token Credentials') {
-        throw new HttpException(
+        throw new BadRequestError(
           'Invalid User Credentials',
-          HttpStatus.BAD_REQUEST,
+          new Error('Invalid Refresh Token Credentials'),
         );
       }
       throw new error();

@@ -8,8 +8,8 @@ import {
 } from '@nestjs/common';
 import { BaseExceptionFilter } from '@nestjs/core';
 import { Request, Response } from 'express';
-import * as dotenv from 'dotenv';
-dotenv.config();
+import process from 'process';
+import { ServiceError } from '../serviceErrorBuilder.utils';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -28,7 +28,14 @@ export class AllExceptionsFilter implements ExceptionFilter {
         : 'Internal Server Error';
 
     if (exception instanceof BadRequestException) {
-      message = exception.getResponse();
+      const badReqErrMessage: any = exception.getResponse();
+      status = badReqErrMessage.statusCode;
+      message = badReqErrMessage.message;
+    }
+
+    if (exception instanceof ServiceError) {
+      message = exception.message;
+      status = exception.statusCode;
     }
 
     const devResponse = {
@@ -48,7 +55,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     };
     response
       .status(status)
-      .json(process.env.ENV == 'DEV' ? devResponse : prodResponse);
+      .json(process?.env?.ENV == 'DEV' ? devResponse : prodResponse);
   }
 }
 

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Redirect } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Redirect, HttpStatus } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
@@ -6,6 +6,7 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RefreshUserPasswordDto } from './dto/resfresh-password.dto';
 import { EmailTokenDto } from './dto/email-token.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { createSuccessResponse } from '../utils/responseBuilder.utils';
 
 @ApiTags('Users')
 @Controller('users')
@@ -14,12 +15,20 @@ export class UsersController {
 
   @Post('/signup')
   async create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+    return createSuccessResponse(
+      HttpStatus.CREATED,
+      'success',
+      await this.usersService.create(createUserDto),
+    );
   }
 
   @Post('/login')
   async login(@Body() loginUserDto: LoginUserDto) {
-    return this.usersService.login(loginUserDto);
+    return createSuccessResponse(
+      HttpStatus.OK,
+      'success',
+      await this.usersService.login(loginUserDto)
+    );
   }
 
   @Post('/refresh')
